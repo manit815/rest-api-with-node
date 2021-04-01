@@ -5,7 +5,7 @@ const helmet = require('helmet');
 const morgan = require('morgan');
 
 const {startDB} = require('./db/mongo');
-const {insertAd, getAds} = require('./db/ads');
+const {insertAd, getAds, deleteAd, updateAd} = require('./db/ads');
 
 const app = express();
 
@@ -27,6 +27,23 @@ app.use(morgan('combined'));
 
 app.get('/', async (req,res) => {
     res.send(await getAds());
+});
+
+app.post('/', async (req, res) => {
+    const newAd = req.body;
+    await insertAd(newAd);
+    res.send({message: 'new ad inserted'});
+});
+
+app.delete('/:id', async (req, res) => {
+    await deleteAd(req.params.id);
+    res.send({message: 'ad removed'});
+});
+
+app.put('/:id', async (req, res) => {
+    const updatedAd = req.body;
+    await updateAd(req.params.id, updatedAd);
+    res.send({message: 'ad updated'});
 });
 
 startDB().then(async () => {
